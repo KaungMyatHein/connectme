@@ -5,16 +5,17 @@ services:
       - "3000"
     volumes:
       - vcard-data:/data
+    env_file:
+      - .env.production
     environment:
-      - AUTH_SECRET=${AUTH_SECRET:?set a long random string in .env.production}
       - DATABASE_URL=file:/data/app.db
     restart: unless-stopped
 
   cloudflared:
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run
-    environment:
-      - TUNNEL_TOKEN=${TUNNEL_TOKEN:?set TUNNEL_TOKEN in .env.production}
+    env_file:
+      - .env.production
     depends_on:
       - app
     restart: unless-stopped
