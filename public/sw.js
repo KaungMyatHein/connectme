@@ -1,9 +1,9 @@
-const VERSION = "v1";
+const VERSION = "v2";
 const CACHE = `connectme-${VERSION}`;
-const OFFLINE_URLS = ["/", "/offline"];
+const PRECACHE = ["/offline"];
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(OFFLINE_URLS)));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(PRECACHE)));
   self.skipWaiting();
 });
 
@@ -16,6 +16,16 @@ self.addEventListener("activate", (e) => {
   self.clients.claim();
 });
 
+function isStaticAsset(url) {
+  return (
+    url.pathname.startsWith("/_next/static/") ||
+    url.pathname === "/manifest.webmanifest" ||
+    url.pathname === "/icon.svg" ||
+    url.pathname === "/apple-icon" ||
+    url.pathname.startsWith("/icons/")
+  );
+}
+
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
@@ -24,20 +34,25 @@ self.addEventListener("fetch", (e) => {
   if (url.origin !== location.origin) return;
   if (url.pathname.startsWith("/api/")) return;
 
-  e.respondWith(
-    (async () => {
-      try {
-        const fresh = await fetch(req);
-        const cache = await caches.open(CACHE);
-        cache.put(req, fresh.clone()).catch(() => {});
-        return fresh;
-      } catch {
-        const cached = await caches.match(req);
+  if (isStaticAsset(url)) {
+    e.respondWith(
+      caches.open(CACHE).then(async (cache) => {
+        const cached = await cache.match(req);
         if (cached) return cached;
+        const fresh = await fetch(req);
+        if (fresh.ok) cache.put(req, fresh.clone()).catch(() => {});
+        return fresh;
+      }),
+    );
+    return;
+  }
+
+  if (req.mode === "navigate") {
+    e.respondWith(
+      fetch(req).catch(async () => {
         const offline = await caches.match("/offline");
-        if (offline) return offline;
-        return new Response("Offline", { status: 503 });
-      }
-    })(),
-  );
+        return offline || new Response("Offline", { status: 503 });
+      }),
+    );
+  }
 });
