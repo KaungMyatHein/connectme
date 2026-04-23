@@ -71,25 +71,6 @@ export function DashboardForm({ initial }: { initial: CardData }) {
         </div>
       </Section>
 
-      <Section title="QR style">
-        <div className="flex flex-wrap gap-2">
-          {(["dots", "rounded", "classy", "classy-rounded", "extra-rounded", "square"] as const).map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => set("qrStyle", s)}
-              className={`glass-chip px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                card.qrStyle === s
-                  ? "bg-[#f0e6d3] text-[#181614] border-[#f0e6d3]"
-                  : "text-[#f0e6d3] hover:bg-[#f0e6d3]/10"
-              }`}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-      </Section>
-
       <div className="sticky bottom-4 flex items-center gap-3">
         <button
           onClick={save}

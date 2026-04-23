@@ -8,12 +8,25 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  username     String   @unique
-  createdAt    DateTime @default(now())
-  card         Card?
+  id            String          @id @default(cuid())
+  email         String          @unique
+  passwordHash  String
+  username      String          @unique
+  createdAt     DateTime        @default(now())
+  card          Card?
+  passwordResets PasswordReset[]
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Card {

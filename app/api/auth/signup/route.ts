@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { createSession, hashPassword, isReservedUsername, isValidUsername } from "@/lib/auth";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "local";
+  if (!rateLimit(`signup:${ip}`, 5, 60_000)) {
+    return NextResponse.json({ error: "Too many signups. Try again later." }, { status: 429 });
+  }
   const { email, password, username, firstName, lastName } = await req.json();
 
   if (!email || !password || !username || !firstName || !lastName) {

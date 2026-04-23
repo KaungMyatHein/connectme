@@ -15,7 +15,14 @@ export function QRClient({ username, qrStyle }: { username: string; qrStyle: QRS
     <>
       <div className="glass p-6 rounded-2xl print:bg-white print:shadow-none print:ring-1 print:ring-neutral-200">
         {url ? (
-          <StyledQR value={url} size={288} style={qrStyle} fgColor="#f0e6d3" bgColor="transparent" />
+          <>
+            <div className="print:hidden">
+              <StyledQR value={url} size={288} style={qrStyle} fgColor="#f0e6d3" bgColor="transparent" />
+            </div>
+            <div className="hidden print:block">
+              <StyledQR value={url} size={288} style={qrStyle} fgColor="#181614" bgColor="#ffffff" />
+            </div>
+          </>
         ) : (
           <div className="h-72 w-72" />
         )}

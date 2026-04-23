@@ -40,10 +40,16 @@ export default async function DashboardPage() {
           </div>
           <div className="flex items-center gap-2">
             <Link
-              href="/dashboard/qr"
+              href={`/${user.username}/qr`}
               className="glass-chip px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#f0e6d3]/10 transition-colors"
             >
               Show QR
+            </Link>
+            <Link
+              href="/dashboard/settings"
+              className="glass-chip px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#f0e6d3]/10 transition-colors"
+            >
+              Settings
             </Link>
             <LogoutButton />
           </div>

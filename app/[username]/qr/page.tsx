@@ -1,13 +1,25 @@
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth";
+import { db } from "@/lib/db";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
+import { isReservedUsername } from "@/lib/auth";
 import { QRClient } from "./QRClient";
 import type { QRStyle } from "@/components/StyledQR";
 
-export default async function DashboardQrPage() {
-  const user = await getCurrentUser();
-  if (!user || !user.card) redirect("/login");
+export default async function PublicQrPage({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
+  const { username } = await params;
+  const uname = username.toLowerCase();
+  if (isReservedUsername(uname)) notFound();
+
+  const user = await db.user.findUnique({
+    where: { username: uname },
+    include: { card: true },
+  });
+  if (!user || !user.card) notFound();
 
   return (
     <main className="relative min-h-screen bg-[#080808] text-[#f0e6d3] flex flex-col items-center justify-center gap-8 p-6 overflow-hidden print:bg-white print:text-neutral-900 print:p-0">
@@ -33,10 +45,10 @@ export default async function DashboardQrPage() {
         <QRClient username={user.username} qrStyle={user.card.qrStyle as QRStyle} />
 
         <Link
-          href="/dashboard"
+          href={`/${user.username}`}
           className="glass-chip print:hidden px-5 py-2 rounded-lg text-sm font-medium text-[#f0e6d3] hover:bg-[#f0e6d3]/10 transition-colors"
         >
-          Back to dashboard
+          View card
         </Link>
       </div>
     </main>
