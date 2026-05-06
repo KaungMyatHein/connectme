@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+// import Link from "next/link"; // re-enable with the "Create your own card" CTA below
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { PublicCardView } from "@/components/PublicCardView";
@@ -81,12 +81,14 @@ export default async function PublicCardPage({
       <AnimatedBackground />
       <div className="relative z-10 flex flex-col items-center gap-8 w-full">
         <PublicCardView card={card} username={user.username} />
+        {/* Temporarily hidden — restore when ready for public signups
         <Link
           href="/signup"
           className="text-xs uppercase tracking-[0.3em] text-[#f0e6d3]/50 hover:text-[#c8a96e] transition-colors"
         >
           Create your own card →
         </Link>
+        */}
       </div>
     </main>
   );
