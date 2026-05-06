@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSessionUserId } from "@/lib/auth";
+import { isTemplateKey } from "@/lib/card-data";
 
 const FIELDS = [
   "firstName", "lastName", "title", "organization", "tagline",
@@ -18,6 +19,9 @@ export async function PATCH(req: Request) {
   }
   if (body.social && typeof body.social === "object") {
     data.social = JSON.stringify(body.social);
+  }
+  if (isTemplateKey(body.template)) {
+    data.template = body.template;
   }
 
   const card = await db.card.update({ where: { userId }, data });

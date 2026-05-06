@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
-import { parseSocial } from "@/lib/card-data";
+import { parseSocial, isTemplateKey, type CardData } from "@/lib/card-data";
 import { DashboardForm } from "./DashboardForm";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
 import { LogoutButton } from "./LogoutButton";
@@ -10,7 +10,7 @@ export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user || !user.card) redirect("/login");
 
-  const card = {
+  const card: CardData = {
     firstName: user.card.firstName,
     lastName: user.card.lastName,
     title: user.card.title,
@@ -22,12 +22,13 @@ export default async function DashboardPage() {
     address: user.card.address,
     social: parseSocial(user.card.social),
     qrStyle: user.card.qrStyle,
+    template: isTemplateKey(user.card.template) ? user.card.template : "classic",
   };
 
   return (
     <main className="relative min-h-screen bg-[#080808] text-[#f0e6d3] overflow-hidden">
       <AnimatedBackground />
-      <div className="relative z-10 max-w-3xl mx-auto px-6 py-10">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-10">
         <header className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold">Your card</h1>
@@ -54,7 +55,7 @@ export default async function DashboardPage() {
             <LogoutButton />
           </div>
         </header>
-        <DashboardForm initial={card} />
+        <DashboardForm initial={card} username={user.username} />
       </div>
     </main>
   );

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { BusinessCard } from "@/components/BusinessCard";
+import { PublicCardView } from "@/components/PublicCardView";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
-import { parseSocial, type CardData } from "@/lib/card-data";
+import { parseSocial, isTemplateKey, type CardData } from "@/lib/card-data";
 import { isReservedUsername } from "@/lib/auth";
 
 export async function generateMetadata({
@@ -73,13 +73,14 @@ export default async function PublicCardPage({
     address: user.card.address,
     social: parseSocial(user.card.social),
     qrStyle: user.card.qrStyle,
+    template: isTemplateKey(user.card.template) ? user.card.template : "classic",
   };
 
   return (
-    <main className="relative min-h-screen bg-[#080808] flex flex-col items-center justify-center p-6 overflow-hidden">
+    <main className="relative min-h-screen bg-[#0b0a09] text-[#f0e6d3] flex flex-col items-center justify-center p-6 overflow-hidden">
       <AnimatedBackground />
-      <div className="relative z-10 flex flex-col items-center gap-6">
-        <BusinessCard card={card} />
+      <div className="relative z-10 flex flex-col items-center gap-8 w-full">
+        <PublicCardView card={card} username={user.username} />
         <Link
           href="/signup"
           className="text-xs uppercase tracking-[0.3em] text-[#f0e6d3]/50 hover:text-[#c8a96e] transition-colors"

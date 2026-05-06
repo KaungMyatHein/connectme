@@ -44,5 +44,6 @@ model Card {
   address      String   @default("")
   social       String   @default("{}")
   qrStyle      String   @default("dots")
+  template     String   @default("classic")
   updatedAt    DateTime @updatedAt
 }
